@@ -40,7 +40,6 @@ def interactive_line(data, x, y, color, line_group, title):
     fig = px.line(data, x=x, y=y, title=title,
                   color=color, line_group=line_group)
     fig.write_html('{}.html'.format(title))
-    fig.show()
     return True
 
 
@@ -64,7 +63,6 @@ gov_inv_type = gov_inv.groupby(['Expenditures', "REF_DATE"], as_index=False).sum
 interactive_line(gov_inv_type, "REF_DATE", "VALUE", "Expenditures",
                  "Expenditures",
                  "Gov_investment_compared")
-print(gov_inv_type.head())
 
 # Capital expenditure analysis
 cap_exp = gov_inv[gov_inv['Expenditures'] == "Capital expenditures"]
@@ -72,7 +70,7 @@ cap_exp = cap_exp.groupby(['Type of activity', "REF_DATE"], as_index=False).sum(
 interactive_line(cap_exp, "REF_DATE", "VALUE", "Type of activity",
                  "Type of activity",
                  "Capital_expenditures_ana")
-print(cap_exp.head())
+
 # Operating expenditures analysis
 non_cap_exp = gov_inv[gov_inv['Expenditures'] == "Capital expenditures"]
 non_cap_exp = non_cap_exp.groupby(['Type of activity', "REF_DATE"],
@@ -80,14 +78,12 @@ non_cap_exp = non_cap_exp.groupby(['Type of activity', "REF_DATE"],
 interactive_line(non_cap_exp, "REF_DATE", "VALUE", "Type of activity",
                  "Type of activity",
                  "Operating_expenditures_ana")
-print(non_cap_exp.head())
 
 # Quantity and method used: substance disposed vs substance recycle
 subs_dispo_type = subs_dispo.groupby(['Category (English)', "Reporting_Year"],
                                      as_index=False).sum()
 interactive_line(subs_dispo_type, "Reporting_Year", "Quantity_converted",
                  "Category (English)", "Category (English)", "Disposal_method")
-print(subs_dispo_type.head())
 
 # Merge recycling and disposing data set
 frames = [subs_recycle, subs_dispo]
@@ -95,7 +91,15 @@ merged_recycle_dispo = pd.concat(frames)
 merged_recycle_dispo = merged_recycle_dispo.sort_values(by=['Reporting_Year'],
                                                         ascending=True)
 merged_recycle_dispo = recycling_dispose(merged_recycle_dispo)
-merged_recycle_dispo_year = merged_recycle_dispo.groupby(["PROVINCE", "Reporting_Year"], as_index=False).sum()
+merged_recycle_dispo_year = merged_recycle_dispo.groupby(["PROVINCE",
+                                                          "Reporting_Year"],
+                                                         as_index=False).sum()
+merged_recycle_dispo_method = merged_recycle_dispo.groupby(["Reporting_Year",
+                                                           "general_method"],
+                                                           as_index=False).sum()
+merged_recycle_dispo_group = merged_recycle_dispo.groupby(['Group (English)',
+                                                           "Reporting_Year"],
+                                                          as_index=False).sum()
 
 # Recycling/Disposal method and amount of waste evaluation
 graph(merged_recycle_dispo, "Reporting_Year", "Quantity_converted",
@@ -108,6 +112,10 @@ plt.close()
 # Amount of waste by province
 interactive_line(merged_recycle_dispo_year, "Reporting_Year", "Quantity_converted",
                 "PROVINCE", "PROVINCE", "waste_by_provinces")
+interactive_line(merged_recycle_dispo_method, "Reporting_Year", "Quantity_converted",
+                 "general_method", "general_method", "methods_summary")
+interactive_line(merged_recycle_dispo_group, "Reporting_Year", "Quantity_converted",
+                 "Group (English)", "Group (English)", "waste_disposed_recycled")
 
 if __name__ == '__main__':
     print()
