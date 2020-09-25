@@ -36,8 +36,9 @@ def graph(data, x, y, hue, name):
     return True
 
 
-def interactive_line(data, x, y, title, color, line_group):
-    fig = px.line(data, x=x, y=y, title=title, color=color, line_group=line_group)
+def interactive_line(data, x, y, color, line_group, title):
+    fig = px.line(data, x=x, y=y, title=title,
+                  color=color, line_group=line_group)
     fig.write_html('{}.html'.format(title))
     fig.show()
     return True
@@ -59,22 +60,35 @@ compare_graph(gov_inv, gov_inv, "REF_DATE", "VALUE", "Expenditures",
               "REF_DATE", "VALUE",
               "Type of activity", "Gov_expenditures_by_type")
 plt.close()
-graph(gov_inv, "REF_DATE", "VALUE",
-      "Expenditures", "Government_investment_compared")
-plt.close()
+gov_inv_type = gov_inv.groupby(['Expenditures', "REF_DATE"], as_index=False).sum()
+interactive_line(gov_inv_type, "REF_DATE", "VALUE", "Expenditures",
+                 "Expenditures",
+                 "Gov_investment_compared")
+print(gov_inv_type.head())
 
 # Capital expenditure analysis
 cap_exp = gov_inv[gov_inv['Expenditures'] == "Capital expenditures"]
-graph(cap_exp, "REF_DATE", "VALUE", "Type of activity", "Capital_expenditure_ana")
-plt.close()
+cap_exp = cap_exp.groupby(['Type of activity', "REF_DATE"], as_index=False).sum()
+interactive_line(cap_exp, "REF_DATE", "VALUE", "Type of activity",
+                 "Type of activity",
+                 "Capital_expenditures_ana")
+print(cap_exp.head())
 # Operating expenditures analysis
 non_cap_exp = gov_inv[gov_inv['Expenditures'] == "Capital expenditures"]
-graph(non_cap_exp, "REF_DATE", "VALUE", "Type of activity", "Operating_expenditures_ana")
-plt.close()
+non_cap_exp = non_cap_exp.groupby(['Type of activity', "REF_DATE"],
+                                  as_index=False).sum()
+interactive_line(non_cap_exp, "REF_DATE", "VALUE", "Type of activity",
+                 "Type of activity",
+                 "Operating_expenditures_ana")
+print(non_cap_exp.head())
+
 # Quantity and method used: substance disposed vs substance recycle
-graph(subs_dispo, "Reporting_Year", "Quantity_converted",
-      "Category (English)", "Disposal_method")
-plt.close()
+subs_dispo_type = subs_dispo.groupby(['Category (English)', "Reporting_Year"],
+                                     as_index=False).sum()
+interactive_line(subs_dispo_type, "Reporting_Year", "Quantity_converted",
+                 "Category (English)", "Category (English)", "Disposal_method")
+print(subs_dispo_type.head())
+
 # Merge recycling and disposing data set
 frames = [subs_recycle, subs_dispo]
 merged_recycle_dispo = pd.concat(frames)
@@ -92,11 +106,8 @@ graph(merged_recycle_dispo, "Reporting_Year", "Quantity_converted",
 plt.close()
 
 # Amount of waste by province
-graph(merged_recycle_dispo, "Reporting_Year", "Quantity_converted",
-      "PROVINCE", "waste_by_provinces")
-plt.close()
 interactive_line(merged_recycle_dispo_year, "Reporting_Year", "Quantity_converted",
-                 "waste_by_province", "PROVINCE", "PROVINCE")
+                "PROVINCE", "PROVINCE", "waste_by_provinces")
 
 if __name__ == '__main__':
     print()
