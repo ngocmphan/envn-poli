@@ -2,8 +2,7 @@ from data_import import gov_inv, subs_release, subs_dispo, subs_recycle
 import matplotlib.pyplot as plt
 import seaborn as sns
 import matplotlib.ticker
-from bokeh.palettes import Spectral4
-from bokeh.plotting  import figure, show
+import plotly.express as px
 import pandas as pd
 
 
@@ -37,7 +36,10 @@ def graph(data, x, y, hue, name):
     return True
 
 
-def interactive_line():
+def interactive_line(data, x, y, title, color, line_group):
+    fig = px.line(data, x=x, y=y, title=title, color=color, line_group=line_group)
+    fig.write_html('{}.html'.format(title))
+    fig.show()
     return True
 
 
@@ -60,6 +62,7 @@ plt.close()
 graph(gov_inv, "REF_DATE", "VALUE",
       "Expenditures", "Government_investment_compared")
 plt.close()
+
 # Capital expenditure analysis
 cap_exp = gov_inv[gov_inv['Expenditures'] == "Capital expenditures"]
 graph(cap_exp, "REF_DATE", "VALUE", "Type of activity", "Capital_expenditure_ana")
@@ -78,6 +81,7 @@ merged_recycle_dispo = pd.concat(frames)
 merged_recycle_dispo = merged_recycle_dispo.sort_values(by=['Reporting_Year'],
                                                         ascending=True)
 merged_recycle_dispo = recycling_dispose(merged_recycle_dispo)
+merged_recycle_dispo_year = merged_recycle_dispo.groupby(["PROVINCE", "Reporting_Year"], as_index=False).sum()
 
 # Recycling/Disposal method and amount of waste evaluation
 graph(merged_recycle_dispo, "Reporting_Year", "Quantity_converted",
@@ -90,7 +94,10 @@ plt.close()
 # Amount of waste by province
 graph(merged_recycle_dispo, "Reporting_Year", "Quantity_converted",
       "PROVINCE", "waste_by_provinces")
-plt.show()
+plt.close()
+interactive_line(merged_recycle_dispo_year, "Reporting_Year", "Quantity_converted",
+                 "waste_by_province", "PROVINCE", "PROVINCE")
+
 if __name__ == '__main__':
-    print(merged_recycle_dispo.info())
+    print()
 

@@ -6,8 +6,6 @@ import missingno as msno
 import numpy as np
 
 
-
-
 def path():
     # Government investments in environment
     gov_inv_path = "3810004301_databaseLoadingData (1).csv"
