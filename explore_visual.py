@@ -60,6 +60,7 @@ compare_graph(gov_inv, gov_inv, "REF_DATE", "VALUE", "Expenditures",
               "Type of activity", "Gov_expenditures_by_type")
 plt.close()
 gov_inv_type = gov_inv.groupby(['Expenditures', "REF_DATE"], as_index=False).sum()
+print(gov_inv_type)
 interactive_line(gov_inv_type, "REF_DATE", "VALUE", "Expenditures",
                  "Expenditures",
                  "Gov_investment_compared")
@@ -116,6 +117,7 @@ interactive_line(merged_recycle_dispo_method, "Reporting_Year", "Quantity_conver
                  "general_method", "general_method", "methods_summary")
 interactive_line(merged_recycle_dispo_group, "Reporting_Year", "Quantity_converted",
                  "Group (English)", "Group (English)", "waste_disposed_recycled")
+
 
 if __name__ == '__main__':
     print()

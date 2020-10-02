@@ -45,15 +45,13 @@ def read_df(gov_inv, subs_release, subs_dispo, subs_recycle):
 
 a, b, c, d = path()
 gov_inv, subs_release, subs_dispo, subs_recycle = read_df(a, b, c, d)
+gov_inv_prov = gov_inv[gov_inv['Type of activity'] != "Total, all activities"]
+gov_inv_prov = gov_inv_prov[gov_inv_prov['GEO'] != "Canada"]
 
 # print(gov_inv.info(), subs_release.info(),
 #     subs_dispo.info(), subs_recycle.info())
-
-# Landfill substance evaluation
-landfill = subs_dispo[subs_dispo['Category (English)'] == "Landfill"]
-
-# print("Quantity of unique substance going to Landfill:",
-#       len(landfill['Substance Name (English)'].unique()))
+inv_2006 = gov_inv_prov[gov_inv_prov['REF_DATE'] == 2006]
 
 if __name__ == '__main__':
-    print()
+    print(len(inv_2006))
+    print(inv_2006['VALUE'].sum())
