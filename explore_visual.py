@@ -4,6 +4,7 @@ import seaborn as sns
 import matplotlib.ticker
 import plotly.express as px
 import pandas as pd
+import numpy as np
 
 
 def compare_graph(data_1,data_2,  x_1, y_1, hue_1, x_2, y_2, hue_2, name):
@@ -58,9 +59,9 @@ def recycling_dispose(data):
 compare_graph(gov_inv, gov_inv, "REF_DATE", "VALUE", "Expenditures",
               "REF_DATE", "VALUE",
               "Type of activity", "Gov_expenditures_by_type")
-plt.close()
+
 gov_inv_type = gov_inv.groupby(['Expenditures', "REF_DATE"], as_index=False).sum()
-print(gov_inv_type)
+
 interactive_line(gov_inv_type, "REF_DATE", "VALUE", "Expenditures",
                  "Expenditures",
                  "Gov_investment_compared")
@@ -113,12 +114,26 @@ plt.close()
 # Amount of waste by province
 interactive_line(merged_recycle_dispo_year, "Reporting_Year", "Quantity_converted",
                 "PROVINCE", "PROVINCE", "waste_by_provinces")
-interactive_line(merged_recycle_dispo_method, "Reporting_Year", "Quantity_converted",
-                 "general_method", "general_method", "methods_summary")
-interactive_line(merged_recycle_dispo_group, "Reporting_Year", "Quantity_converted",
-                 "Group (English)", "Group (English)", "waste_disposed_recycled")
+interactive_line(merged_recycle_dispo_method, "Reporting_Year",
+                 "Quantity_converted", "general_method",
+                 "general_method", "methods_summary")
+interactive_line(merged_recycle_dispo_group, "Reporting_Year",
+                 "Quantity_converted", "Group (English)",
+                 "Group (English)", "waste_disposed_recycled")
 
+# Correlation coefficient between Waste and investment: -0.89785
+aggregate_waste_by_year = merged_recycle_dispo.groupby('Reporting_Year').sum()
+aggregate_gov = gov_inv.groupby(['REF_DATE']).sum()
+aggregate_waste_inv = pd.merge(aggregate_waste_by_year, aggregate_gov,
+                               how='right', right_on=aggregate_gov.index,
+                               left_on=aggregate_waste_by_year.index)
 
+corr_waste_inv = np.corrcoef(aggregate_waste_inv['Quantity'],
+                             aggregate_waste_inv['VALUE'])
+
+# Correlation coefficient between waste recycled and investment related:
+
+# Correlation coefficient between waste disposed and investment related:
 if __name__ == '__main__':
     print()
 

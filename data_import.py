@@ -48,10 +48,7 @@ gov_inv, subs_release, subs_dispo, subs_recycle = read_df(a, b, c, d)
 gov_inv_prov = gov_inv[gov_inv['Type of activity'] != "Total, all activities"]
 gov_inv_prov = gov_inv_prov[gov_inv_prov['GEO'] != "Canada"]
 
-# print(gov_inv.info(), subs_release.info(),
-#     subs_dispo.info(), subs_recycle.info())
-inv_2006 = gov_inv_prov[gov_inv_prov['REF_DATE'] == 2006]
-
+print(gov_inv.info(), subs_release.info(),
+    subs_dispo.info(), subs_recycle.info())
 if __name__ == '__main__':
-    print(len(inv_2006))
-    print(inv_2006['VALUE'].sum())
+    print()
