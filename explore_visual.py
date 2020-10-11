@@ -56,22 +56,37 @@ def recycling_dispose(data):
 
 
 def data_subsets_gov(data):
-    year = data.groupby('REF_DATE').sum()
-    expenditures = data.groupby(['Expenditures', 'REF_DATE']).sum()
-    location = data.groupby(['GEO', 'REF_DATE']).sum()
-    type = data.groupby(['Type of activity', 'REF_DATE']).sum()
+    year = data.groupby('REF_DATE', as_index=False).sum()
+    expenditures = data.groupby(['Expenditures', 'REF_DATE'],
+                                as_index=False).sum()
+    location = data.groupby(['GEO', 'REF_DATE'], as_index=False).sum()
+    type = data.groupby(['Type of activity', 'REF_DATE'], as_index=False).sum()
     return year, expenditures, location, type
 
 
 def data_subs_release(data):
     data = recycling_dispose(data)
-    year = data.groupby('REF_DATE').sum()
-    category = data.groupby(['Category (English)', 'Reporting_Year']).sum()
-    location = data.groupby(['PROVINCE', 'Reporting_Year']).sum()
-    general_group = data.groupby(['general_method', 'Reporting_Year']).sum()
-    detailed_group = data.groupby(['Group (English)', 'Reporting_Year']).sum()
+    year = data.groupby('REF_DATE', as_index=False).sum()
+    category = data.groupby(['Category (English)', 'Reporting_Year'],
+                            as_index=False).sum()
+    location = data.groupby(['PROVINCE', 'Reporting_Year'], as_index=False).sum()
+    general_group = data.groupby(['general_method', 'Reporting_Year'],
+                                 as_index=False).sum()
+    detailed_group = data.groupby(['Group (English)', 'Reporting_Year'],
+                                  as_index=False).sum()
     return year, category, location, general_group, detailed_group
 
+
+# Data subsets
+gov_inv_year, gov_inv_exp, gov_inv_loc, \
+    gov_inv_activity = data_subsets_gov(gov_inv)
+
+dispo_year, dispo_category, \
+    dispo_loc, dispo_group, dispo_detailed_group = data_subs_release(subs_dispo)
+
+recycle_year, recycle_category, \
+    recycle_loc, recycle_group, \
+    recycle_detailed_group = data_subs_release(subs_recycle)
 
 # Compare capital vs operating expenses
 compare_graph(gov_inv, gov_inv, "REF_DATE", "VALUE", "Expenditures",
