@@ -19,27 +19,28 @@ def path():
 
 
 def real_units(data):
-    if data['Units'] == "kg":
-        return data['Quantity']*1000
-    elif data['Units'] == "tonnes":
-        return data['Quantity']*1000000
-    else:
+    if data['Units'] == 'kg':
+        return data['Quantity']*0.001
+    elif data['Units'] == 'tonnes':
         return data['Quantity']
+    else:
+        return data['Quantity']/1000000
+
+
+def df_prep(data):
+    years = list(range(2006, 2017))
+    data_prep = pd.read_csv(data, encoding= 'ISO-8859-1', low_memory=False)
+    data_prep = data_prep[data_prep['Reporting_Year'].isin(years)]
+    data_prep['Quantity_converted'] = data_prep.apply(real_units, axis=1)
+    return data_prep
 
 
 def read_df(gov_inv, subs_release, subs_dispo, subs_recycle):
     gov_inv = pd.read_csv(gov_inv, low_memory=False)
     gov_inv = gov_inv[gov_inv['STATUS'].isin(["F", "x", ".."]) == False]
-    years = list(range(2006, 2017))
-    subs_release = pd.read_csv(subs_release, encoding='ISO-8859-1', low_memory=False)
-    subs_release = subs_release[subs_release['Reporting_Year'].isin(years)]
-    subs_release['Quantity_converted'] = subs_release.apply(real_units, axis=1)
-    subs_dispo = pd.read_csv(subs_dispo, encoding='ISO-8859-1', low_memory=False)
-    subs_dispo = subs_dispo[subs_dispo['Reporting_Year'].isin(years)]
-    subs_dispo['Quantity_converted'] = subs_dispo.apply(real_units, axis=1)
-    subs_recycle = pd.read_csv(subs_recycle, encoding='ISO-8859-1', low_memory=False)
-    subs_recycle = subs_recycle[subs_recycle['Reporting_Year'].isin(years)]
-    subs_recycle['Quantity_converted'] = subs_recycle.apply(real_units, axis=1)
+    subs_release = df_prep(subs_release)
+    subs_recycle = df_prep(subs_recycle)
+    subs_dispo = df_prep(subs_dispo)
     return gov_inv, subs_release, subs_dispo, subs_recycle
 
 

@@ -147,7 +147,11 @@ interactive_line(merged_recycle_dispo_group, "Reporting_Year",
 
 
 # Correlation coefficient between Waste and investment: -0.89785
-aggregate_waste_by_year = merged_recycle_dispo.groupby('Reporting_Year').sum()
+aggregate_waste_by_year = merged_recycle_dispo.groupby('Reporting_Year',
+                                                       as_index=False).sum()
+interactive_line(aggregate_waste_by_year, 'Reporting_Year', "Quantity_converted",
+                 None, None, "Waste_by_year")
+
 aggregate_gov = gov_inv.groupby(['REF_DATE']).sum()
 aggregate_waste_inv = pd.merge(aggregate_waste_by_year, aggregate_gov,
                                how='right', right_on=aggregate_gov.index,
@@ -170,6 +174,16 @@ corr_recycle_inv = np.corrcoef(aggregate_recycle_inv['Quantity'],
 
 
 # Correlation coefficient between waste disposed and investment related:
+dispose_data = merged_recycle_dispo[merged_recycle_dispo
+                                    ['general_method'] == 'disposed']
+aggregate_dispose_by_year = dispose_data.groupby('Reporting_Year').sum()
+aggregate_dispose_inv = pd.merge(aggregate_dispose_by_year, aggregate_gov,
+                                 how='right', right_on=aggregate_gov.index,
+                                 left_on=aggregate_dispose_by_year.index)
+
+corr_dispose_inv = np.corrcoef(aggregate_dispose_inv['Quantity'],
+                               aggregate_dispose_inv['VALUE'])
+
 if __name__ == '__main__':
     print()
 
