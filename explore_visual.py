@@ -60,13 +60,14 @@ def data_subsets_gov(data):
     expenditures = data.groupby(['Expenditures', 'REF_DATE'],
                                 as_index=False).sum()
     location = data.groupby(['GEO', 'REF_DATE'], as_index=False).sum()
-    type = data.groupby(['Type of activity', 'REF_DATE'], as_index=False).sum()
+    type = data.groupby(['Type of activity', 'REF_DATE', "Expenditures"],
+                        as_index=False).sum()
     return year, expenditures, location, type
 
 
 def data_subs_release(data):
     data = recycling_dispose(data)
-    year = data.groupby('REF_DATE', as_index=False).sum()
+    year = data.groupby('Reporting_Year', as_index=False).sum()
     category = data.groupby(['Category (English)', 'Reporting_Year'],
                             as_index=False).sum()
     location = data.groupby(['PROVINCE', 'Reporting_Year'], as_index=False).sum()
@@ -88,6 +89,7 @@ recycle_year, recycle_category, \
     recycle_loc, recycle_group, \
     recycle_detailed_group = data_subs_release(subs_recycle)
 
+print(gov_inv_activity.columns)
 # Compare capital vs operating expenses
 compare_graph(gov_inv, gov_inv, "REF_DATE", "VALUE", "Expenditures",
               "REF_DATE", "VALUE",
