@@ -59,10 +59,12 @@ def data_subsets_gov(data):
     year = data.groupby('REF_DATE', as_index=False).sum()
     expenditures = data.groupby(['Expenditures', 'REF_DATE'],
                                 as_index=False).sum()
+    exp_act = data.groupby(['Expenditures', 'REF_DATE', 'Type of activity'],
+                           as_index=False).sum()
     location = data.groupby(['GEO', 'REF_DATE'], as_index=False).sum()
-    type = data.groupby(['Type of activity', 'REF_DATE', "Expenditures"],
+    type = data.groupby(['Type of activity', 'REF_DATE'],
                         as_index=False).sum()
-    return year, expenditures, location, type
+    return year, expenditures, location, type, exp_act
 
 
 def data_subs_release(data):
@@ -80,7 +82,7 @@ def data_subs_release(data):
 
 # Data subsets
 gov_inv_year, gov_inv_exp, gov_inv_loc, \
-    gov_inv_activity = data_subsets_gov(gov_inv)
+    gov_inv_activity, gov_inv_exp_act = data_subsets_gov(gov_inv)
 
 dispo_year, dispo_category, \
     dispo_loc, dispo_group, dispo_detailed_group = data_subs_release(subs_dispo)
@@ -89,34 +91,28 @@ recycle_year, recycle_category, \
     recycle_loc, recycle_group, \
     recycle_detailed_group = data_subs_release(subs_recycle)
 
-print(gov_inv_activity.columns)
+frames = [subs_recycle, subs_dispo]
+merged_recycle_dispo = pd.concat(frames)
+merged_recycle_dispo = merged_recycle_dispo.sort_values(by=['Reporting_Year'],
+                                                        ascending=True)
+
+merged_recycle_dispo_year, merged_recycle_dispo_category, \
+    merged_recycle_dispo_loc, merged_recycle_dispo_group, \
+    merged_recycle_dispo_detailed_group = data_subs_release(merged_recycle_dispo)
+
+
 # Compare capital vs operating expenses
 compare_graph(gov_inv, gov_inv, "REF_DATE", "VALUE", "Expenditures",
               "REF_DATE", "VALUE",
               "Type of activity", "Gov_expenditures_by_type")
 
-gov_inv_type = gov_inv.groupby(['Expenditures', "REF_DATE"], as_index=False).sum()
-
-interactive_line(gov_inv_type, "REF_DATE", "VALUE", "Expenditures",
-                 "Expenditures",
-                 "Gov_investment_compared")
+interactive_line(gov_inv_exp, "REF_DATE", 'VALUE', "Expenditures",
+                 'Expenditures', "Gov_investment_compared")
 
 
-# Capital expenditure analysis
-cap_exp = gov_inv[gov_inv['Expenditures'] == "Capital expenditures"]
-cap_exp = cap_exp.groupby(['Type of activity', "REF_DATE"], as_index=False).sum()
-interactive_line(cap_exp, "REF_DATE", "VALUE", "Type of activity",
-                 "Type of activity",
-                 "Capital_expenditures_ana")
-
-
-# Operating expenditures analysis
-non_cap_exp = gov_inv[gov_inv['Expenditures'] == "Capital expenditures"]
-non_cap_exp = non_cap_exp.groupby(['Type of activity', "REF_DATE"],
-                                  as_index=False).sum()
-interactive_line(non_cap_exp, "REF_DATE", "VALUE", "Type of activity",
-                 "Type of activity",
-                 "Operating_expenditures_ana")
+# Capital/operating expenditure analysis
+interactive_line(gov_inv_exp_act, 'REF_DATE', 'VALUE', 'Expenditures',
+                 'Type of activity', 'Expenditures_analysis')
 
 
 # Quantity and method used: substance disposed vs substance recycle
@@ -126,80 +122,56 @@ interactive_line(subs_dispo_type, "Reporting_Year", "Quantity_converted",
                  "Category (English)", "Category (English)", "Disposal_method")
 
 
-# Merge recycling and disposing data set
-frames = [subs_recycle, subs_dispo]
-merged_recycle_dispo = pd.concat(frames)
-merged_recycle_dispo = merged_recycle_dispo.sort_values(by=['Reporting_Year'],
-                                                        ascending=True)
-merged_recycle_dispo = recycling_dispose(merged_recycle_dispo)
-merged_recycle_dispo_year = merged_recycle_dispo.groupby(["PROVINCE",
-                                                          "Reporting_Year"],
-                                                         as_index=False).sum()
-merged_recycle_dispo_method = merged_recycle_dispo.groupby(["Reporting_Year",
-                                                           "general_method"],
-                                                           as_index=False).sum()
-merged_recycle_dispo_group = merged_recycle_dispo.groupby(['Group (English)',
-                                                           "Reporting_Year"],
-                                                          as_index=False).sum()
-
-
 # Recycling/Disposal method and amount of waste evaluation
 graph(merged_recycle_dispo, "Reporting_Year", "Quantity_converted",
       "Group (English)", "waste_disposed_recycled")
-plt.close()
+
 graph(merged_recycle_dispo, "Reporting_Year", "Quantity_converted",
       "general_method", "methods_summary")
-plt.close()
 
 
 # Amount of waste by province
-interactive_line(merged_recycle_dispo_year, "Reporting_Year", "Quantity_converted",
+interactive_line(merged_recycle_dispo_loc, "Reporting_Year", "Quantity_converted",
                 "PROVINCE", "PROVINCE", "waste_by_provinces")
-interactive_line(merged_recycle_dispo_method, "Reporting_Year",
+interactive_line(merged_recycle_dispo_group, "Reporting_Year",
                  "Quantity_converted", "general_method",
                  "general_method", "methods_summary")
-interactive_line(merged_recycle_dispo_group, "Reporting_Year",
+interactive_line(merged_recycle_dispo_detailed_group, "Reporting_Year",
                  "Quantity_converted", "Group (English)",
                  "Group (English)", "waste_disposed_recycled")
 
 
-# Correlation coefficient between Waste and investment: -0.89785
-aggregate_waste_by_year = merged_recycle_dispo.groupby('Reporting_Year',
-                                                       as_index=False).sum()
-interactive_line(aggregate_waste_by_year, 'Reporting_Year', "Quantity_converted",
+# Correlation coefficient between Waste and investment:
+interactive_line(merged_recycle_dispo_year, 'Reporting_Year', "Quantity_converted",
                  None, None, "Waste_by_year")
 
-aggregate_gov = gov_inv.groupby(['REF_DATE']).sum()
-aggregate_waste_inv = pd.merge(aggregate_waste_by_year, aggregate_gov,
-                               how='right', right_on=aggregate_gov.index,
-                               left_on=aggregate_waste_by_year.index)
+aggregate_waste_inv = pd.merge(merged_recycle_dispo_year, gov_inv_year,
+                               how='right',
+                               right_on=gov_inv_year['REF_DATE'],
+                               left_on=merged_recycle_dispo_year
+                               ['Reporting_Year'])
 
 corr_waste_inv = np.corrcoef(aggregate_waste_inv['Quantity'],
                              aggregate_waste_inv['VALUE'])
 
 
 # Correlation coefficient between waste recycled and investment related:
-recycle_data = merged_recycle_dispo[merged_recycle_dispo
-                                    ['general_method'] == 'recycled']
-aggregate_recycle_by_year = recycle_data.groupby('Reporting_Year').sum()
-aggregate_recycle_inv = pd.merge(aggregate_recycle_by_year, aggregate_gov,
-                                 how='right', right_on=aggregate_gov.index,
-                                 left_on=aggregate_recycle_by_year.index)
+aggregate_recycle_inv = pd.merge(recycle_year, gov_inv_year,
+                                 how='right', right_on=gov_inv_year['REF_DATE'],
+                                 left_on=recycle_year['Reporting_Year'])
 
 corr_recycle_inv = np.corrcoef(aggregate_recycle_inv['Quantity'],
                                aggregate_recycle_inv['VALUE'])
 
 
 # Correlation coefficient between waste disposed and investment related:
-dispose_data = merged_recycle_dispo[merged_recycle_dispo
-                                    ['general_method'] == 'disposed']
-aggregate_dispose_by_year = dispose_data.groupby('Reporting_Year').sum()
-aggregate_dispose_inv = pd.merge(aggregate_dispose_by_year, aggregate_gov,
-                                 how='right', right_on=aggregate_gov.index,
-                                 left_on=aggregate_dispose_by_year.index)
+aggregate_dispose_inv = pd.merge(dispo_year, gov_inv_year,
+                                 how='right', right_on=gov_inv_year['REF_DATE'],
+                                 left_on=dispo_year['Reporting_Year'])
 
 corr_dispose_inv = np.corrcoef(aggregate_dispose_inv['Quantity'],
                                aggregate_dispose_inv['VALUE'])
+
 
 if __name__ == '__main__':
     print()
