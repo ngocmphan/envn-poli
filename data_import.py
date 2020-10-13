@@ -16,7 +16,7 @@ def path():
     # Substance recycled treatment off-site
     subs_recycle_path = "NPRI_SubsDisp_Tran-Recy_1993.csv"
     # Canadian population by province annually
-    province_pop = "annual_canada_pop.csv"
+    province_pop = "canada_pop_province.csv"
     return gov_inv_path, subs_release_path, subs_dispo_path, \
         subs_recycle_path, province_pop
 
@@ -45,7 +45,9 @@ def read_df(gov_inv, subs_release, subs_dispo, subs_recycle, can_pop):
     subs_recycle = df_prep(subs_recycle)
     subs_dispo = df_prep(subs_dispo)
     canada_pop = pd.read_csv(can_pop, low_memory=False,
-                             skiprows=lambda x: x not in list(range(0, 23)))
+                             skiprows=lambda x: x not in list(range(5, 21)))
+    canada_pop = canada_pop.iloc[1:, 2:]
+    canada_pop['Reference period'] = canada_pop['Reference period'].apply(int)
     return gov_inv, subs_release, subs_dispo, subs_recycle, canada_pop
 
 
@@ -55,7 +57,7 @@ gov_inv_prov = gov_inv[gov_inv['Type of activity'] != "Total, all activities"]
 gov_inv_prov = gov_inv_prov[gov_inv_prov['GEO'] != "Canada"]
 
 # print(gov_inv.info(), subs_release.info(),
-#     subs_dispo.info(), subs_recycle.info(), canada_population.infor())
+#     subs_dispo.info(), subs_recycle.info())
 
 if __name__ == '__main__':
     print()

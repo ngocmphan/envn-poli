@@ -172,7 +172,7 @@ aggregate_dispose_inv = pd.merge(dispo_year, gov_inv_year,
 corr_dispose_inv = np.corrcoef(aggregate_dispose_inv['Quantity'],
                                aggregate_dispose_inv['VALUE'])
 
-
+print(merged_recycle_dispo.head())
 if __name__ == '__main__':
     print()
 
