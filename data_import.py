@@ -8,15 +8,15 @@ import numpy as np
 
 def path():
     # Government investments in environment
-    gov_inv_path = "business_inv_env.csv"
+    gov_inv_path = "data_sources/business_inv_env.csv"
     # Substance released into environment
-    subs_release_path = "NPRI_subsrele_1993.csv"
+    subs_release_path = "data_sources/NPRI_subsrele_1993.csv"
     # Substance disposed off-site
-    subs_dispo_path = "NPRI_SubsDisp_1993.csv"
+    subs_dispo_path = "data_sources/NPRI_SubsDisp_1993.csv"
     # Substance recycled treatment off-site
-    subs_recycle_path = "NPRI_SubsDisp_Tran-Recy_1993.csv"
+    subs_recycle_path = "data_sources/NPRI_SubsDisp_Tran-Recy_1993.csv"
     # Canadian population by province annually
-    province_pop = "canada_pop_province.csv"
+    province_pop = "data_sources/canada_pop_province.csv"
     return gov_inv_path, subs_release_path, subs_dispo_path, \
         subs_recycle_path, province_pop
 
