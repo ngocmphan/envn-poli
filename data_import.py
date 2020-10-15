@@ -56,8 +56,6 @@ gov_inv, subs_release, subs_dispo, subs_recycle, canada_population = read_df(a, 
 gov_inv_prov = gov_inv[gov_inv['Type of activity'] != "Total, all activities"]
 gov_inv_prov = gov_inv_prov[gov_inv_prov['GEO'] != "Canada"]
 
-# print(gov_inv.info(), subs_release.info(),
-#     subs_dispo.info(), subs_recycle.info())
 
 if __name__ == '__main__':
     print()
