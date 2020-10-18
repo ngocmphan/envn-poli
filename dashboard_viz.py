@@ -19,7 +19,7 @@ def adjusted_province(data_frame):
     data_frame_copy.loc[data_frame
                         ['PROVINCE'] == 'AB', 'PROVINCE_ADJUSTED'] = 'Alta.'
     data_frame_copy.loc[data_frame
-                        ['PROVINCE'] == 'BC', 'PROVINCE_ADJUSTED'] = 'B.C'
+                        ['PROVINCE'] == 'BC', 'PROVINCE_ADJUSTED'] = 'B.C.'
     data_frame_copy.loc[data_frame
                         ['PROVINCE'] == 'MB', 'PROVINCE_ADJUSTED'] = 'Man.'
     data_frame_copy.loc[data_frame
@@ -29,13 +29,13 @@ def adjusted_province(data_frame):
     data_frame_copy.loc[data_frame
                         ['PROVINCE'] == 'NS', 'PROVINCE_ADJUSTED'] = 'N.S.'
     data_frame_copy.loc[data_frame
-                        ['PROVINCE'] == 'NT', 'PROVINCE_ADJUSTED'] = 'N.W.T'
+                        ['PROVINCE'] == 'NT', 'PROVINCE_ADJUSTED'] = 'N.W.T.'
     data_frame_copy.loc[data_frame
                         ['PROVINCE'] == 'NU', 'PROVINCE_ADJUSTED'] = 'Nvt.'
     data_frame_copy.loc[data_frame
                         ['PROVINCE'] == 'ON', 'PROVINCE_ADJUSTED'] = 'Ont.'
     data_frame_copy.loc[data_frame
-                        ['PROVINCE'] == 'PE', 'PROVINCE_ADJUSTED'] = 'P.E.I'
+                        ['PROVINCE'] == 'PE', 'PROVINCE_ADJUSTED'] = 'P.E.I.'
     data_frame_copy.loc[data_frame
                         ['PROVINCE'] == 'QC', 'PROVINCE_ADJUSTED'] = 'Que.'
     data_frame_copy.loc[data_frame
