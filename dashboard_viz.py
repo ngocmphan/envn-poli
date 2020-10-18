@@ -6,6 +6,7 @@ import bokeh
 import bokeh.palettes as bp
 import geopandas as gpd
 from explore_visual import merged_recycle_dispo_loc, recycle_loc, dispo_loc
+import matplotlib.pyplot as plt
 from data_import import canada_population
 import json
 
@@ -50,11 +51,9 @@ def json_sources(data_frame):
     canada = r'lpr_000b16a_e/lpr_000b16a_e.shp'
     canada_shape = gpd.read_file(canada)
     merged_data = canada_shape.merge(data_frame, left_on='PREABBR',
-                                     right_on='PROVINCE_ADJUSTED')
-    merged_json = json.loads(merged_data.to_json())
-    json_data = json.dumps(merged_json)
-    geosource = GeoJSONDataSource(geojson=json_data)
-    return geosource
+                                     right_on='PROVINCE_ADJUSTED', how='left')
+    json_data = json.dumps(json.loads(merged_data.to_json()))
+    return GeoJSONDataSource(geojson=json_data)
 
 
 def data_for_viz(year, type_of_method):
@@ -62,49 +61,49 @@ def data_for_viz(year, type_of_method):
         data_frame = recycle_loc[recycle_loc['Reporting_Year'] == year]
         data_frame = data_frame[['PROVINCE', 'Quantity_converted']]
         data_frame = adjusted_province(data_frame)
-        data_source = json_sources(data_frame)
-        return data_source
+        return data_frame
     elif type_of_method == 'disposed':
         data_frame = dispo_loc[dispo_loc['Reporting_Year'] == year]
         data_frame = data_frame[['PROVINCE', 'Quantity_converted']]
         data_frame = adjusted_province(data_frame)
-        data_source = json_sources(data_frame)
-        return data_source
+        return data_frame
     elif type_of_method == 'total':
         data_frame = merged_recycle_dispo_loc[merged_recycle_dispo_loc
                                               ['Reporting_Year'] == year]
         data_frame = data_frame[['PROVINCE', 'Quantity_converted']]
         data_frame = adjusted_province(data_frame)
-        data_source = json_sources(data_frame)
-        return data_source
+        return data_frame
     else:
         raise ValueError('Input validation required')
 
 
-data_viz = data_for_viz(year_chosen, method_chosen)
-palette = bp.brewer['YlGnBu'][8]
-palette = palette[::-1]
-color_mapper = LinearColorMapper(palette=palette, low=0, high=100000,
-                                 nan_color='#d9d9d9')
-hover = HoverTool(tooltips=[('Country/region', '@PROVINCE_ADJUSTED'),
-                             ('Amount of Waste', '@Quantity_converted')])
-color_bar = ColorBar(color_mapper=color_mapper, label_standoff=8,width = 500, height = 20,
-                     border_line_color=None,location = (0,0), orientation = 'horizontal')
+def bokeh_choropleth(gdf, column=None, title=''):
+    geosource = json_sources(gdf)
+    palette = bp.brewer['OrRd'][8]
+    palette = palette[::-1]
+    vals = gdf[column]
 
-p = figure(title='Wast released by provinces, 2006',
-           plot_height=600, plot_width=950, toolbar_location=None, tools=[hover])
-p.xgrid.grid_line_color = None
-p.ygrid.grid_line_color = None
+    color_mapper = LinearColorMapper(palette=palette, low=vals.min(),
+                                     high=vals.max())
+    color_bar = ColorBar(color_mapper=color_mapper, label_standoff=8, width=500,
+                         height=20, location=(0, 0), orientation='horizontal')
+    tools = 'wheel_zoom,pan,reset'
+    p = figure(title=title, plot_height=400, plot_width=850,
+               toolbar_location='right', tools=tools)
+    p.xgrid.grid_line_color = None
+    p.ygrid.grid_line_color = None
+    p.patches('xs', 'ys', source=geosource, fill_alpha=1, line_width=0.5,
+              line_color='black',
+              fill_color={'field': column, 'transform': color_mapper})
+    p.add_layout(color_bar, 'below')
+    bokeh.plotting.output_file('{}.html'.format(title))
+    bokeh.plotting.save(p)
+    bokeh.plotting.show(p)
+    return p
 
-# Add patch renderer to figure.
-p.patches('xs', 'ys', source=data_viz,
-          fill_color={'field': 'Quantity_converted', 'transform': color_mapper},
-          line_color='black', line_width=0.25, fill_alpha=1)
-p.add_layout(color_bar)
 
-bokeh.plotting.output_file('test_heatmap.html')
-
-print(recycle_loc[recycle_loc['PROVINCE'] == 'QC'])
+data = data_for_viz(year_chosen, method_chosen)
+bokeh_choropleth(data, 'Quantity_converted', 'test_choropleth')
 
 if __name__ == '__main__':
     print()

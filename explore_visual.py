@@ -129,7 +129,7 @@ graph(merged_recycle_dispo, "Reporting_Year", "Quantity_converted",
 graph(merged_recycle_dispo, "Reporting_Year", "Quantity_converted",
       "general_method", "methods_summary")
 
-
+plt.close()
 # Amount of waste by province
 interactive_line(merged_recycle_dispo_loc, "Reporting_Year", "Quantity_converted",
                 "PROVINCE", "PROVINCE", "waste_by_provinces")
