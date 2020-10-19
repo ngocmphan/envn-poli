@@ -11,7 +11,7 @@ This further expands to the prediction of different type of substances released 
 The government used data regarding waste and substances released into the environment reported from Canadian institutions, businesses and others to determine the appropriate environmental policies and monitoring.
 Data is collected every two years and ranges from 2006 - 2016.
 
-* [Capital and Operating expenditures on environmental protection, by type of activity](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3810004301). (Statistics Canada)
+* [Capital and Operating expenditures on environmental protection, by type of activity](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3810004301). (Statistics Canada):
 Data is collected every two years, ranges from 2006 - 2016, from Statistics Canada, Environment, Energy and Transportation Statistics Division. 
 These expenditures are categorized as Operating/capital expenditures and types of activities invested. 
 
