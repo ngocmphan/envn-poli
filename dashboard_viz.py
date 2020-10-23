@@ -79,23 +79,20 @@ def data_for_viz(year, type_of_method):
 
 def bokeh_choropleth(gdf, column=None, title=''):
     geosource = json_sources(gdf)
-    palette = bp.brewer['OrRd'][8]
+    palette = bp.brewer['OrRd'][5]
     palette = palette[::-1]
     vals = gdf[column]
 
     color_mapper = LinearColorMapper(palette=palette, low=vals.min(),
                                      high=vals.max())
-    color_bar = ColorBar(color_mapper=color_mapper, label_standoff=8, width=500,
-                         height=20, location=(0, 0), orientation='horizontal')
-    tools = 'wheel_zoom,pan,reset'
-    p = figure(title=title, plot_height=400, plot_width=850,
-               toolbar_location='right', tools=tools)
-    p.xgrid.grid_line_color = None
-    p.ygrid.grid_line_color = None
+    # tools = 'wheel_zoom,pan,reset'
+    TOOLTIP = [('PROVINCE', '@PROVINCE_ADJUSTED'),
+               ('Amount of waste', '$Quantity_converted')]
+    p = figure(title=title, plot_width=800, plot_height=300,
+               toolbar_location='right', tooltips=TOOLTIP)
     p.patches('xs', 'ys', source=geosource, fill_alpha=1, line_width=0.5,
               line_color='black',
               fill_color={'field': column, 'transform': color_mapper})
-    p.add_layout(color_bar, 'below')
     bokeh.plotting.output_file('{}.html'.format(title))
     bokeh.plotting.save(p)
     bokeh.plotting.show(p)
@@ -103,7 +100,7 @@ def bokeh_choropleth(gdf, column=None, title=''):
 
 
 data = data_for_viz(year_chosen, method_chosen)
-bokeh_choropleth(data, 'Quantity_converted', 'test_choropleth')
+bokeh_choropleth(data, 'Quantity_converted', 'test_choropleth_1')
 
 if __name__ == '__main__':
     print()
