@@ -54,7 +54,7 @@ def json_sources(data_frame):
     merged_data = canada_shape.merge(data_frame, left_on='PREABBR',
                                      right_on='PROVINCE_ADJUSTED', how='left')
     json_data = json.dumps(json.loads(merged_data.to_json()))
-    return GeoJSONDataSource(geojson=json_data)
+    return json_data
 
 
 def data_for_viz(year, type_of_method):
@@ -79,9 +79,9 @@ def data_for_viz(year, type_of_method):
 
 
 def bokeh_choropleth(gdf, type_of_method, column=None, title=''):
-    geosource = json_sources(gdf)
+    geosource = GeoJSONDataSource(geojson=json_sources(gdf))
 
-    palette = bp.brewer['OrRd'][5]
+    palette = bp.brewer['OrRd'][9]
     palette = palette[::-1]
     vals = gdf[column]
 
@@ -89,9 +89,11 @@ def bokeh_choropleth(gdf, type_of_method, column=None, title=''):
                                      high=vals.max())
     # tools = 'wheel_zoom,pan,reset'
     TOOLTIP = [('PROVINCE', '@PROVINCE_ADJUSTED'),
-               ('Amount of waste', '$Quantity_converted')]
+               ('Amount of waste', '@Quantity_converted{int}')]
+    hover = HoverTool(tooltips=TOOLTIP)
+
     p = figure(title=title, plot_width=800, plot_height=300,
-               toolbar_location='right', tooltips=TOOLTIP)
+               toolbar_location='right', tools=[hover])
     p.patches('xs', 'ys', source=geosource, fill_alpha=1, line_width=0.5,
               line_color='black',
               fill_color={'field': column, 'transform': color_mapper})
@@ -105,12 +107,12 @@ def bokeh_choropleth(gdf, type_of_method, column=None, title=''):
 
     slider = Slider(title='Year', start=2006, end=2016, step=1, value=2016)
     slider.on_change('value', update_plot)
-    layout = bokeh.layouts.column(p, widgetbox(slider))
+    layout = bokeh.layouts.column(p, bokeh.models.Column(slider))
     curdoc().add_root(layout)
 
     bokeh.plotting.output_file('{}.html'.format(title))
     bokeh.plotting.save(layout)
-    return p
+    return layout
 
 
 # Javascript callbacks
