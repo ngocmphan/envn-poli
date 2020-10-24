@@ -1,4 +1,5 @@
-from data_import import gov_inv, subs_release, subs_dispo, subs_recycle
+from data_import import gov_inv_prov, subs_release, subs_dispo, subs_recycle, \
+    canada_population
 import matplotlib.pyplot as plt
 import seaborn as sns
 import matplotlib.ticker
@@ -82,7 +83,7 @@ def data_subs_release(data):
 
 # Data subsets
 gov_inv_year, gov_inv_exp, gov_inv_loc, \
-    gov_inv_activity, gov_inv_exp_act = data_subsets_gov(gov_inv)
+    gov_inv_activity, gov_inv_exp_act = data_subsets_gov(gov_inv_prov)
 
 dispo_year, dispo_category, \
     dispo_loc, dispo_group, dispo_detailed_group = data_subs_release(subs_dispo)
@@ -102,7 +103,7 @@ merged_recycle_dispo_year, merged_recycle_dispo_category, \
 
 
 # Compare capital vs operating expenses
-compare_graph(gov_inv, gov_inv, "REF_DATE", "VALUE", "Expenditures",
+compare_graph(gov_inv_prov, gov_inv_prov, "REF_DATE", "VALUE", "Expenditures",
               "REF_DATE", "VALUE",
               "Type of activity", "Gov_expenditures_by_type")
 
@@ -172,6 +173,8 @@ aggregate_dispose_inv = pd.merge(dispo_year, gov_inv_year,
 corr_dispose_inv = np.corrcoef(aggregate_dispose_inv['Quantity'],
                                aggregate_dispose_inv['VALUE'])
 
+print(recycle_loc.columns)
+print(canada_population.columns)
 if __name__ == '__main__':
     print()
 

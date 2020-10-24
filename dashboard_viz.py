@@ -7,6 +7,7 @@ import bokeh
 import bokeh.palettes as bp
 import geopandas as gpd
 from explore_visual import merged_recycle_dispo_loc, recycle_loc, dispo_loc
+from data_import import canada_population
 from bokeh.io import curdoc
 import json
 
@@ -77,7 +78,7 @@ def data_for_viz(year, type_of_method):
         raise ValueError('Input validation required')
 
 
-def bokeh_choropleth(gdf, column=None, title=''):
+def bokeh_choropleth(gdf, type_of_method, column=None, title=''):
     geosource = json_sources(gdf)
 
     palette = bp.brewer['OrRd'][5]
@@ -96,25 +97,25 @@ def bokeh_choropleth(gdf, column=None, title=''):
               fill_color={'field': column, 'transform': color_mapper})
 
     def update_plot(attr, old, new):
-        yr = Slider.value
-        new_data = json_sources(yr)
+        yr = slider.value
+        new_data = data_for_viz(yr, type_of_method)
+        new_data = json_sources(new_data)
         geosource.geojson = new_data
         p.title.text = 'Amounts of waste by province, %d' %yr
 
-    slider = Slider(title='Year', start=2006, end=2016, step=2, value=2016)
+    slider = Slider(title='Year', start=2006, end=2016, step=1, value=2016)
     slider.on_change('value', update_plot)
-    layout = bokeh.layouts.column(p, bokeh.models.Column(slider))
+    layout = bokeh.layouts.column(p, widgetbox(slider))
     curdoc().add_root(layout)
 
     bokeh.plotting.output_file('{}.html'.format(title))
     bokeh.plotting.save(layout)
-    bokeh.plotting.show(layout)
     return p
 
-# Have to import data, then visualize. Currently, you cannot get the data
-# before the bokeh_choropleth because the update_plot is within that function.
-# Javascript callbacks
 
+# Javascript callbacks
+data = data_for_viz(year_chosen, method_chosen)
+bokeh_choropleth(data, method_chosen, 'Quantity_converted', 'Choropleth_slider')
 
 if __name__ == '__main__':
     print()

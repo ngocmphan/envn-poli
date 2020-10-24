@@ -51,11 +51,16 @@ def read_df(gov_inv, subs_release, subs_dispo, subs_recycle, can_pop):
     return gov_inv, subs_release, subs_dispo, subs_recycle, canada_pop
 
 
+def adjusted_provinces(df):
+    df_copy = df.copy()
+
+    return True
+
+
 a, b, c, d, e = path()
 gov_inv, subs_release, subs_dispo, subs_recycle, canada_population = read_df(a, b, c, d, e)
 gov_inv_prov = gov_inv[gov_inv['Type of activity'] != "Total, all activities"]
 gov_inv_prov = gov_inv_prov[gov_inv_prov['GEO'] != "Canada"]
-
 
 if __name__ == '__main__':
     print()
