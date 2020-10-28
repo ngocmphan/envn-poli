@@ -101,8 +101,14 @@ def bokeh_choropleth(gdf, type_of_method, column=None, title=''):
     def update_plot(attr, old, new):
         yr = slider.value
         new_data = data_for_viz(yr, type_of_method)
+        vals = new_data['Quantity_converted']
         new_data = json_sources(new_data)
         geosource.geojson = new_data
+        color_mapper = LinearColorMapper(palette=palette, low=vals.min(),
+                                         high=vals.max())
+        p.patches('xs', 'ys', source=geosource.geojson, fill_color={
+            'field': column, 'transform': color_mapper
+        })
         p.title.text = 'Amounts of waste by province, %d' %yr
 
     slider = Slider(title='Year', start=2006, end=2016, step=1, value=2016)

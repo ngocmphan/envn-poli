@@ -1,5 +1,5 @@
 from data_import import gov_inv_prov, subs_release, subs_dispo, subs_recycle, \
-    canada_population
+    canada_po
 import matplotlib.pyplot as plt
 import seaborn as sns
 import matplotlib.ticker
@@ -173,8 +173,6 @@ aggregate_dispose_inv = pd.merge(dispo_year, gov_inv_year,
 corr_dispose_inv = np.corrcoef(aggregate_dispose_inv['Quantity'],
                                aggregate_dispose_inv['VALUE'])
 
-print(recycle_loc.columns)
-print(canada_population.columns)
 if __name__ == '__main__':
     print()
 

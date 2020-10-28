@@ -61,6 +61,9 @@ a, b, c, d, e = path()
 gov_inv, subs_release, subs_dispo, subs_recycle, canada_population = read_df(a, b, c, d, e)
 gov_inv_prov = gov_inv[gov_inv['Type of activity'] != "Total, all activities"]
 gov_inv_prov = gov_inv_prov[gov_inv_prov['GEO'] != "Canada"]
+canada_pop = canada_population.melt(id_vars=['Reference period'],
+                                    var_name='PROVINCE',
+                                    value_name='population')
 
 if __name__ == '__main__':
     print()
