@@ -53,8 +53,33 @@ def read_df(gov_inv, subs_release, subs_dispo, subs_recycle, can_pop):
 
 def adjusted_provinces(df):
     df_copy = df.copy()
-
-    return True
+    df_copy.loc[df_copy['PROVINCE'] == 'Alberta', 'PROVINCE_ADJUSTED'] = 'Alta.'
+    df_copy.loc[df_copy['PROVINCE'] == 'British Columbia',
+                'PROVINCE_ADJUSTED'] = 'B.C.'
+    df_copy.loc[df_copy['PROVINCE'] == 'Manitoba',
+                'PROVINCE_ADJUSTED'] = 'Man.'
+    df_copy.loc[df_copy['PROVINCE'] == 'New Brunswick',
+                'PROVINCE_ADJUSTED'] = 'N.B.'
+    df_copy.loc[df_copy['PROVINCE'] == 'Newfoundland and Labrador',
+                'PROVINCE_ADJUSTED'] = 'N.L.'
+    df_copy.loc[df_copy['PROVINCE'] == 'Nova Scotia',
+                'PROVINCE_ADJUSTED'] = 'N.S.'
+    df_copy.loc[df_copy['PROVINCE'] == 'Northwest Territories 7',
+                'PROVINCE_ADJUSTED'] = 'N.W.T.'
+    df_copy.loc[df_copy['PROVINCE'] == 'Nunavut 7',
+                'PROVINCE_ADJUSTED'] = 'Nvt.'
+    df_copy.loc[df_copy['PROVINCE'] == 'Ontario',
+                'PROVINCE_ADJUSTED'] = 'Ont.'
+    df_copy.loc[df_copy['PROVINCE'] == 'Prince Edward Island',
+                'PROVINCE_ADJUSTED'] = 'P.E.I.'
+    df_copy.loc[df_copy['PROVINCE'] == 'Quebec',
+                'PROVINCE_ADJUSTED'] = 'Que.'
+    df_copy.loc[df_copy['PROVINCE'] == 'Saskatchewan',
+                'PROVINCE_ADJUSTED'] = 'Sask.'
+    df_copy.loc[df_copy['PROVINCE'] == 'Yukon',
+                'PROVINCE_ADJUSTED'] = 'Y.T.'
+    df_copy = df_copy[['Reference period', 'PROVINCE_ADJUSTED', 'population']]
+    return df_copy
 
 
 a, b, c, d, e = path()
@@ -64,6 +89,7 @@ gov_inv_prov = gov_inv_prov[gov_inv_prov['GEO'] != "Canada"]
 canada_pop = canada_population.melt(id_vars=['Reference period'],
                                     var_name='PROVINCE',
                                     value_name='population')
+canada_pop = adjusted_provinces(canada_pop)
 
 if __name__ == '__main__':
     print()

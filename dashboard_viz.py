@@ -7,7 +7,7 @@ import bokeh
 import bokeh.palettes as bp
 import geopandas as gpd
 from explore_visual import merged_recycle_dispo_loc, recycle_loc, dispo_loc
-from data_import import canada_population
+from data_import import canada_pop
 from bokeh.io import curdoc
 import json
 
@@ -17,31 +17,31 @@ method_chosen = 'recycled'
 
 def adjusted_province(data_frame):
     data_frame_copy = data_frame.copy()
-    data_frame_copy.loc[data_frame
+    data_frame_copy.loc[data_frame_copy
                         ['PROVINCE'] == 'AB', 'PROVINCE_ADJUSTED'] = 'Alta.'
-    data_frame_copy.loc[data_frame
+    data_frame_copy.loc[data_frame_copy
                         ['PROVINCE'] == 'BC', 'PROVINCE_ADJUSTED'] = 'B.C.'
-    data_frame_copy.loc[data_frame
+    data_frame_copy.loc[data_frame_copy
                         ['PROVINCE'] == 'MB', 'PROVINCE_ADJUSTED'] = 'Man.'
-    data_frame_copy.loc[data_frame
+    data_frame_copy.loc[data_frame_copy
                         ['PROVINCE'] == 'NB', 'PROVINCE_ADJUSTED'] = 'N.B.'
-    data_frame_copy.loc[data_frame
+    data_frame_copy.loc[data_frame_copy
                         ['PROVINCE'] == 'NL', 'PROVINCE_ADJUSTED'] = 'N.L.'
-    data_frame_copy.loc[data_frame
+    data_frame_copy.loc[data_frame_copy
                         ['PROVINCE'] == 'NS', 'PROVINCE_ADJUSTED'] = 'N.S.'
-    data_frame_copy.loc[data_frame
+    data_frame_copy.loc[data_frame_copy
                         ['PROVINCE'] == 'NT', 'PROVINCE_ADJUSTED'] = 'N.W.T.'
-    data_frame_copy.loc[data_frame
+    data_frame_copy.loc[data_frame_copy
                         ['PROVINCE'] == 'NU', 'PROVINCE_ADJUSTED'] = 'Nvt.'
-    data_frame_copy.loc[data_frame
+    data_frame_copy.loc[data_frame_copy
                         ['PROVINCE'] == 'ON', 'PROVINCE_ADJUSTED'] = 'Ont.'
-    data_frame_copy.loc[data_frame
+    data_frame_copy.loc[data_frame_copy
                         ['PROVINCE'] == 'PE', 'PROVINCE_ADJUSTED'] = 'P.E.I.'
-    data_frame_copy.loc[data_frame
+    data_frame_copy.loc[data_frame_copy
                         ['PROVINCE'] == 'QC', 'PROVINCE_ADJUSTED'] = 'Que.'
-    data_frame_copy.loc[data_frame
+    data_frame_copy.loc[data_frame_copy
                         ['PROVINCE'] == 'SK', 'PROVINCE_ADJUSTED'] = 'Sask.'
-    data_frame_copy.loc[data_frame
+    data_frame_copy.loc[data_frame_copy
                         ['PROVINCE'] == 'YT', 'PROVINCE_ADJUSTED'] = 'Y.T.'
     data_frame_copy = data_frame_copy[['PROVINCE_ADJUSTED',
                                        'Quantity_converted']]
