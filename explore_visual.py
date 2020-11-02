@@ -1,5 +1,5 @@
 from data_import import gov_inv_prov, subs_release, subs_dispo, subs_recycle, \
-    canada_po
+    canada_pop
 import matplotlib.pyplot as plt
 import seaborn as sns
 import matplotlib.ticker

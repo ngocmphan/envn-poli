@@ -10,8 +10,9 @@ from explore_visual import merged_recycle_dispo_loc, recycle_loc, dispo_loc
 from data_import import canada_pop
 from bokeh.io import curdoc
 import json
+from datetime import datetime
 
-year_chosen = 2006
+year_chosen = 2007
 method_chosen = 'recycled'
 
 
@@ -78,7 +79,8 @@ def data_for_viz(year, type_of_method):
         raise ValueError('Input validation required')
 
 
-def bokeh_choropleth(gdf, type_of_method, column=None, title=''):
+def bokeh_choropleth(year, type_of_method, column=None, title=''):
+    gdf = data_for_viz(year, type_of_method)
     geosource = GeoJSONDataSource(geojson=json_sources(gdf))
 
     palette = bp.brewer['OrRd'][9]
@@ -101,29 +103,22 @@ def bokeh_choropleth(gdf, type_of_method, column=None, title=''):
     def update_plot(attr, old, new):
         yr = slider.value
         new_data = data_for_viz(yr, type_of_method)
-        vals = new_data['Quantity_converted']
-        new_data = json_sources(new_data)
-        geosource.geojson = new_data
-        color_mapper = LinearColorMapper(palette=palette, low=vals.min(),
-                                         high=vals.max())
-        p.patches('xs', 'ys', source=geosource.geojson, fill_color={
-            'field': column, 'transform': color_mapper
-        })
-        p.title.text = 'Amounts of waste by province, %d' %yr
+        complete_data = json_sources(new_data)
+        geosource.geojson = complete_data
+        p.add_tools(HoverTool(tooltips=TOOLTIP ))
 
-    slider = Slider(title='Year', start=2006, end=2016, step=1, value=2016)
+    slider = Slider(title='Year', start=2006, end=2016, step=1, value=2007)
     slider.on_change('value', update_plot)
-    layout = bokeh.layouts.column(p, bokeh.models.Column(slider))
+    layout = bokeh.layouts.layout(p, bokeh.models.Column(slider))
     curdoc().add_root(layout)
-
     bokeh.plotting.output_file('{}.html'.format(title))
     bokeh.plotting.save(layout)
     return layout
 
 
+time = datetime.now()
 # Javascript callbacks
-data = data_for_viz(year_chosen, method_chosen)
-bokeh_choropleth(data, method_chosen, 'Quantity_converted', 'Choropleth_slider')
-
+bokeh_choropleth(year_chosen, method_chosen, 'Quantity_converted',
+                 'Choropleth_test')
 if __name__ == '__main__':
     print()
