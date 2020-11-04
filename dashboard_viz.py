@@ -12,7 +12,7 @@ from bokeh.io import curdoc
 import json
 from datetime import datetime
 
-year_chosen = 2007
+year_chosen = 2006
 method_chosen = 'recycled'
 
 
@@ -54,7 +54,8 @@ def json_sources(data_frame):
     canada_shape = gpd.read_file(canada)
     merged_data = canada_shape.merge(data_frame, left_on='PREABBR',
                                      right_on='PROVINCE_ADJUSTED', how='left')
-    json_data = json.dumps(json.loads(merged_data.to_json()))
+    merged_json = json.loads(merged_data.to_json())
+    json_data = json.dumps(merged_json)
     return json_data
 
 
@@ -79,6 +80,10 @@ def data_for_viz(year, type_of_method):
         raise ValueError('Input validation required')
 
 
+def data_merged_pop(year, type_of_method):
+    return True
+
+
 def bokeh_choropleth(year, type_of_method, column=None, title=''):
     gdf = data_for_viz(year, type_of_method)
     geosource = GeoJSONDataSource(geojson=json_sources(gdf))
@@ -94,20 +99,21 @@ def bokeh_choropleth(year, type_of_method, column=None, title=''):
                ('Amount of waste', '@Quantity_converted{int}')]
     hover = HoverTool(tooltips=TOOLTIP)
 
-    p = figure(title=title, plot_width=800, plot_height=300,
+    p = figure(title=title, plot_width=750, plot_height=500,
                toolbar_location='right', tools=[hover])
-    p.patches('xs', 'ys', source=geosource, fill_alpha=1, line_width=0.5,
+    p.patches('xs', 'ys', source=geosource, fill_alpha=1, line_width=0.3,
               line_color='black',
               fill_color={'field': column, 'transform': color_mapper})
 
     def update_plot(attr, old, new):
-        yr = slider.value
+        yr = int(slider.value)
         new_data = data_for_viz(yr, type_of_method)
         complete_data = json_sources(new_data)
         geosource.geojson = complete_data
-        p.add_tools(HoverTool(tooltips=TOOLTIP ))
+        p.add_tools(HoverTool(tooltips=[('PROVINCE', '@PROVINCE_ADJUSTED'),
+                    ('Amount of waste', '@Quantity_converted{int}')]))
 
-    slider = Slider(title='Year', start=2006, end=2016, step=1, value=2007)
+    slider = Slider(title='Year', start=2006, end=2016, step=1, value=2006)
     slider.on_change('value', update_plot)
     layout = bokeh.layouts.layout(p, bokeh.models.Column(slider))
     curdoc().add_root(layout)
