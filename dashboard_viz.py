@@ -1,7 +1,7 @@
 from urllib.request import urlopen
-from bokeh.models import GeoJSONDataSource, LinearColorMapper, ColorBar
+from bokeh.models import GeoJSONDataSource, LinearColorMapper, Slider, HoverTool
 from bokeh.plotting import figure
-from bokeh.models import Slider, HoverTool
+from bokeh.models.glyphs import Patches
 from bokeh.layouts import widgetbox, row, column
 import bokeh
 import bokeh.palettes as bp
@@ -12,7 +12,7 @@ from bokeh.io import curdoc
 import json
 from datetime import datetime
 
-year_chosen = 2006
+year_chosen = 2007
 method_chosen = 'recycled'
 
 
@@ -54,6 +54,7 @@ def json_sources(data_frame):
     canada_shape = gpd.read_file(canada)
     merged_data = canada_shape.merge(data_frame, left_on='PREABBR',
                                      right_on='PROVINCE_ADJUSTED', how='left')
+    merged_data.fillna('No data', inplace=True)
     merged_json = json.loads(merged_data.to_json())
     json_data = json.dumps(merged_json)
     return json_data
@@ -106,14 +107,17 @@ def bokeh_choropleth(year, type_of_method, column=None, title=''):
               fill_color={'field': column, 'transform': color_mapper})
 
     def update_plot(attr, old, new):
-        yr = int(slider.value)
+        yr = slider.value
         new_data = data_for_viz(yr, type_of_method)
+        vals = new_data[column]
         complete_data = json_sources(new_data)
+        color_mapper.low = vals.min()
+        color_mapper.high = vals.max()
         geosource.geojson = complete_data
         p.add_tools(HoverTool(tooltips=[('PROVINCE', '@PROVINCE_ADJUSTED'),
                     ('Amount of waste', '@Quantity_converted{int}')]))
 
-    slider = Slider(title='Year', start=2006, end=2016, step=1, value=2006)
+    slider = Slider(title='Year', start=2006, end=2016, step=1, value=2007)
     slider.on_change('value', update_plot)
     layout = bokeh.layouts.layout(p, bokeh.models.Column(slider))
     curdoc().add_root(layout)
@@ -122,9 +126,8 @@ def bokeh_choropleth(year, type_of_method, column=None, title=''):
     return layout
 
 
-time = datetime.now()
-# Javascript callbacks
-bokeh_choropleth(year_chosen, method_chosen, 'Quantity_converted',
-                 'Choropleth_test')
+def dashboard_viz(dashboard_1, dashboard_2):
+    return True
+
 if __name__ == '__main__':
     print()
