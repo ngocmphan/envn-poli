@@ -110,10 +110,9 @@ def bokeh_choropleth(year, type_of_method, column=None, title=''):
         yr = slider.value
         new_data = data_for_viz(yr, type_of_method)
         vals = new_data[column]
-        complete_data = json_sources(new_data)
         color_mapper.low = vals.min()
         color_mapper.high = vals.max()
-        geosource.geojson = complete_data
+        geosource.geojson = new_data.to_json()
         p.add_tools(HoverTool(tooltips=[('PROVINCE', '@PROVINCE_ADJUSTED'),
                     ('Amount of waste', '@Quantity_converted{int}')]))
 
@@ -129,5 +128,7 @@ def bokeh_choropleth(year, type_of_method, column=None, title=''):
 def dashboard_viz(dashboard_1, dashboard_2):
     return True
 
+data = data_for_viz(year_chosen, method_chosen)
+source = GeoJSONDataSource(geojson=json_sources(data))
 if __name__ == '__main__':
     print()
