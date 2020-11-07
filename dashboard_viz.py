@@ -85,6 +85,17 @@ def data_merged_pop(year, type_of_method):
     return True
 
 
+def update_plot(attr, old, new):
+    yr = slider.value
+    new_data = data_for_viz(yr, type_of_method)
+    vals = new_data[column]
+    color_mapper.low = vals.min()
+    color_mapper.high = vals.max()
+    geosource.geojson = new_data.to_json()
+    p.add_tools(HoverTool(tooltips=[('PROVINCE', '@PROVINCE_ADJUSTED'),
+                ('Amount of waste', '@Quantity_converted{int}')]))
+
+
 def bokeh_choropleth(year, type_of_method, column=None, title=''):
     gdf = data_for_viz(year, type_of_method)
     geosource = GeoJSONDataSource(geojson=json_sources(gdf))
@@ -106,16 +117,6 @@ def bokeh_choropleth(year, type_of_method, column=None, title=''):
               line_color='black',
               fill_color={'field': column, 'transform': color_mapper})
 
-    def update_plot(attr, old, new):
-        yr = slider.value
-        new_data = data_for_viz(yr, type_of_method)
-        vals = new_data[column]
-        color_mapper.low = vals.min()
-        color_mapper.high = vals.max()
-        geosource.geojson = new_data.to_json()
-        p.add_tools(HoverTool(tooltips=[('PROVINCE', '@PROVINCE_ADJUSTED'),
-                    ('Amount of waste', '@Quantity_converted{int}')]))
-
     slider = Slider(title='Year', start=2006, end=2016, step=1, value=2007)
     slider.on_change('value', update_plot)
     layout = bokeh.layouts.layout(p, bokeh.models.Column(slider))
@@ -127,6 +128,7 @@ def bokeh_choropleth(year, type_of_method, column=None, title=''):
 
 def dashboard_viz(dashboard_1, dashboard_2):
     return True
+
 
 data = data_for_viz(year_chosen, method_chosen)
 source = GeoJSONDataSource(geojson=json_sources(data))
