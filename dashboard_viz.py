@@ -104,7 +104,8 @@ def data_merged_pop(year, data_frame):
 #                 ('Amount of waste', '@Quantity_converted{int}')]))
 
 
-def bokeh_choropleth(year, type_of_method, column=None, title=''):
+def bokeh_choropleth(year, type_of_method, title=''):
+    column = 'Quantity_converted'
     gdf = data_for_viz(year, type_of_method)
     geosource = GeoJSONDataSource(geojson=json_sources(gdf))
 
@@ -154,7 +155,6 @@ def dashboard_viz(dashboard_1, dashboard_2):
     return True
 
 
-bokeh_choropleth(year_chosen, method_chosen,
-                 'Quantity_converted', 'Test_choropleth_Nov13')
+bokeh_choropleth(year_chosen, method_chosen, 'Test_choropleth_Nov13')
 if __name__ == '__main__':
     print()
