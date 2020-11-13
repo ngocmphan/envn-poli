@@ -91,5 +91,6 @@ canada_pop = canada_population.melt(id_vars=['Reference period'],
                                     value_name='population')
 canada_pop = adjusted_provinces(canada_pop)
 
+print(canada_pop)
 if __name__ == '__main__':
     print()
