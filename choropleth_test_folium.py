@@ -9,10 +9,9 @@ import webbrowser
 canada = r'lpr_000b16a_e/lpr_000b16a_e.shp'
 canada_shape = gpd.read_file(canada)
 canada_shape = canada_shape[['PREABBR', 'geometry']]
-canada_shape = canada_shape.set_index('PREABBR')
-canada_shape.to_file('canada.geojson', driver='GeoJSON', index='PREABBR')
-
-canada_geo = '/Users/ngocphan/PycharmProjects/envn_poli/canada.geojson'
+canada_shape['geometry'] = canada_shape['geometry'].to_crs(epsg=4326)
+canada_shape.to_file('canada.json', driver='GeoJSON')
+canada_geo = '/Users/ngocphan/PycharmProjects/envn_poli/canada.json'
 
 # Data frame handling
 
@@ -20,32 +19,32 @@ canada_geo = '/Users/ngocphan/PycharmProjects/envn_poli/canada.geojson'
 def adjusted_province(data_frame):
     data_frame_copy = data_frame.copy()
     data_frame_copy.loc[data_frame_copy
-                        ['PROVINCE'] == 'AB', 'PROVINCE_ADJUSTED'] = 'Alta.'
+                        ['PROVINCE'] == 'AB', 'PREABBR'] = 'Alta.'
     data_frame_copy.loc[data_frame_copy
-                        ['PROVINCE'] == 'BC', 'PROVINCE_ADJUSTED'] = 'B.C.'
+                        ['PROVINCE'] == 'BC', 'PREABBR'] = 'B.C.'
     data_frame_copy.loc[data_frame_copy
-                        ['PROVINCE'] == 'MB', 'PROVINCE_ADJUSTED'] = 'Man.'
+                        ['PROVINCE'] == 'MB', 'PREABBR'] = 'Man.'
     data_frame_copy.loc[data_frame_copy
-                        ['PROVINCE'] == 'NB', 'PROVINCE_ADJUSTED'] = 'N.B.'
+                        ['PROVINCE'] == 'NB', 'PREABBR'] = 'N.B.'
     data_frame_copy.loc[data_frame_copy
-                        ['PROVINCE'] == 'NL', 'PROVINCE_ADJUSTED'] = 'N.L.'
+                        ['PROVINCE'] == 'NL', 'PREABBR'] = 'N.L.'
     data_frame_copy.loc[data_frame_copy
-                        ['PROVINCE'] == 'NS', 'PROVINCE_ADJUSTED'] = 'N.S.'
+                        ['PROVINCE'] == 'NS', 'PREABBR'] = 'N.S.'
     data_frame_copy.loc[data_frame_copy
-                        ['PROVINCE'] == 'NT', 'PROVINCE_ADJUSTED'] = 'N.W.T.'
+                        ['PROVINCE'] == 'NT', 'PREABBR'] = 'N.W.T.'
     data_frame_copy.loc[data_frame_copy
-                        ['PROVINCE'] == 'NU', 'PROVINCE_ADJUSTED'] = 'Nvt.'
+                        ['PROVINCE'] == 'NU', 'PREABBR'] = 'Nvt.'
     data_frame_copy.loc[data_frame_copy
-                        ['PROVINCE'] == 'ON', 'PROVINCE_ADJUSTED'] = 'Ont.'
+                        ['PROVINCE'] == 'ON', 'PREABBR'] = 'Ont.'
     data_frame_copy.loc[data_frame_copy
-                        ['PROVINCE'] == 'PE', 'PROVINCE_ADJUSTED'] = 'P.E.I.'
+                        ['PROVINCE'] == 'PE', 'PREABBR'] = 'P.E.I.'
     data_frame_copy.loc[data_frame_copy
-                        ['PROVINCE'] == 'QC', 'PROVINCE_ADJUSTED'] = 'Que.'
+                        ['PROVINCE'] == 'QC', 'PREABBR'] = 'Que.'
     data_frame_copy.loc[data_frame_copy
-                        ['PROVINCE'] == 'SK', 'PROVINCE_ADJUSTED'] = 'Sask.'
+                        ['PROVINCE'] == 'SK', 'PREABBR'] = 'Sask.'
     data_frame_copy.loc[data_frame_copy
-                        ['PROVINCE'] == 'YT', 'PROVINCE_ADJUSTED'] = 'Y.T.'
-    data_frame_copy = data_frame_copy[['PROVINCE_ADJUSTED',
+                        ['PROVINCE'] == 'YT', 'PREABBR'] = 'Y.T.'
+    data_frame_copy = data_frame_copy[['PREABBR',
                                        'Quantity_converted']]
     return data_frame_copy
 
@@ -53,6 +52,7 @@ def adjusted_province(data_frame):
 data_frame = recycle_loc[recycle_loc['Reporting_Year'] == 2006]
 data_frame = data_frame[['PROVINCE', 'Quantity_converted']]
 data_frame = adjusted_province(data_frame)
+data_frame = data_frame.reset_index(drop=True)
 
 
 # Choropleth test
@@ -62,9 +62,9 @@ folium.Choropleth(
     geo_data=canada_geo,
     name='choropleth',
     data=data_frame,
-    columns=['PROVINCE_ADJUSTED', 'Quantity_converted'],
+    columns=['PREABBR', 'Quantity_converted'],
     key_on='feature.properties.PREABBR',
-    fill_color='YlGn',
+    fill_color='BuPu',
     fill_opacity=0.7,
     line_opacity=0.2,
     legend_name='Waste Produced in 000',
@@ -75,7 +75,6 @@ folium.LayerControl().add_to(m)
 
 m.save('choropleth_test.html')
 url = 'choropleth_test.html'
-webbrowser.open(url)
 
 
 if __name__ == '__main__':
