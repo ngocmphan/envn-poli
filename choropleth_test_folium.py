@@ -62,7 +62,6 @@ max_color = max(data_frame['Quantity_converted'])
 min_color = min(data_frame['Quantity_converted'])
 cmap = cm.linear.YlOrRd_09.scale(min_color, max_color)
 data_frame['color'] = data_frame['Quantity_converted'].map(cmap)
-
 province_list = data_frame['PREABBR'].unique().tolist()
 province_idx = range(len(province_list))
 viz_dict = {}
