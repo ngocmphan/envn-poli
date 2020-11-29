@@ -4,6 +4,8 @@ import json
 from explore_visual import recycle_loc
 import folium
 import webbrowser
+import branca.colormap as cm
+from folium.plugins import TimeSliderChoropleth
 
 # Shapefile to json handling
 canada = r'lpr_000b16a_e/lpr_000b16a_e.shp'
@@ -44,37 +46,56 @@ def adjusted_province(data_frame):
                         ['PROVINCE'] == 'SK', 'PREABBR'] = 'Sask.'
     data_frame_copy.loc[data_frame_copy
                         ['PROVINCE'] == 'YT', 'PREABBR'] = 'Y.T.'
-    data_frame_copy = data_frame_copy[['PREABBR',
+    data_frame_copy = data_frame_copy[['Reporting_Year', 'PREABBR',
                                        'Quantity_converted']]
     return data_frame_copy
 
 
-data_frame = recycle_loc[recycle_loc['Reporting_Year'] == 2006]
-data_frame = data_frame[['PROVINCE', 'Quantity_converted']]
+data_frame = recycle_loc.copy()
 data_frame = adjusted_province(data_frame)
 data_frame = data_frame.reset_index(drop=True)
+data_frame['Reporting_Year'] = pd.to_datetime(data_frame['Reporting_Year'])\
+                                .astype(int).astype(str)
+
+# Adjusted data set for TimesliderChoropleth
+max_color = max(data_frame['Quantity_converted'])
+min_color = min(data_frame['Quantity_converted'])
+cmap = cm.linear.YlOrRd_09.scale(min_color, max_color)
+data_frame['color'] = data_frame['Quantity_converted'].map(cmap)
+
+province_list = data_frame['PREABBR'].unique().tolist()
+province_idx = range(len(province_list))
+viz_dict = {}
+for i in province_idx:
+    province = province_list[i]
+    result = data_frame[data_frame['PREABBR'] == province]
+    inner_dict = {}
+    for index, r in result.iterrows():
+        inner_dict[r['Reporting_Year']] = {'color': r['color'], 'opacity': 0.7}
+    viz_dict[str(i)] = inner_dict
 
 
 # Choropleth test
 m = folium.Map(location=[48, -102], zoom_start=4)
-bins = list(data_frame['Quantity_converted'].quantile([0, 0.25, 0.5, 0.75, 1]))
-folium.Choropleth(
-    geo_data=canada_geo,
-    name='choropleth',
-    data=data_frame,
-    columns=['PREABBR', 'Quantity_converted'],
-    key_on='feature.properties.PREABBR',
-    fill_color='BuPu',
-    fill_opacity=0.7,
-    line_opacity=0.2,
-    legend_name='Waste Produced in 000',
-    bins=bins,
-    reset=True
-).add_to(m)
+# folium.Choropleth(
+#     geo_data=canada_geo,
+#     name='choropleth',
+#     data=data_frame,
+#     columns=['PREABBR', 'Quantity_converted'],
+#     key_on='feature.properties.PREABBR',
+#     fill_color='BuPu',
+#     fill_opacity=0.7,
+#     line_opacity=0.2,
+#     legend_name='Waste Produced in 000',
+#     bins=bins,
+#     reset=True
+# ).add_to(m)
+
+TimeSliderChoropleth(data=canada_shape.to_json(), styledict=viz_dict,
+                     name='Waste by province').add_to(m)
 folium.LayerControl().add_to(m)
 
 m.save('choropleth_test.html')
-url = 'choropleth_test.html'
 
 
 if __name__ == '__main__':
