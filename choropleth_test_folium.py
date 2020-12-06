@@ -54,8 +54,9 @@ def adjusted_province(data_frame):
 data_frame = recycle_loc.copy()
 data_frame = adjusted_province(data_frame)
 data_frame = data_frame.reset_index(drop=True)
-data_frame['Reporting_Year'] = pd.to_datetime(data_frame['Reporting_Year'])\
-                                .astype(int).astype(str)
+# data_frame['Reporting_Year'] = pd.DatetimeIndex()
+print(data_frame['Reporting_Year'][0], type(data_frame['Reporting_Year'][0]))
+# Year to YYYYMMDD to datetime index
 
 # Adjusted data set for TimesliderChoropleth
 max_color = max(data_frame['Quantity_converted'])
@@ -73,7 +74,6 @@ for i in province_idx:
         inner_dict[r['Reporting_Year']] = {'color': r['color'], 'opacity': 0.7}
     viz_dict[str(i)] = inner_dict
 
-
 # Choropleth test
 m = folium.Map(location=[48, -102], zoom_start=4)
 # folium.Choropleth(
@@ -90,11 +90,11 @@ m = folium.Map(location=[48, -102], zoom_start=4)
 #     reset=True
 # ).add_to(m)
 
-TimeSliderChoropleth(data=canada_shape.to_json(), styledict=viz_dict,
-                     name='Waste by province').add_to(m)
-folium.LayerControl().add_to(m)
-
-m.save('choropleth_test.html')
+# TimeSliderChoropleth(data=canada_shape.to_json(), styledict=viz_dict,
+#                      name='Waste by province').add_to(m)
+# folium.LayerControl().add_to(m)
+#
+# m.save('choropleth_test.html')
 
 
 if __name__ == '__main__':
