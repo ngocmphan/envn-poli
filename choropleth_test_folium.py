@@ -71,37 +71,26 @@ viz_frame = pd.merge(data_frame, canada_shape, on="PREABBR")
 max_color = max(data_frame['Quantity_converted'])
 min_color = min(data_frame['Quantity_converted'])
 cmap = cm.linear.YlOrRd_09.scale(min_color, max_color)
-data_frame['color'] = data_frame['Quantity_converted'].map(cmap)
+viz_frame['color'] = viz_frame['Quantity_converted'].map(cmap)
 
 # Styledict for TimesliderChoropleth
-province_list = data_frame['PREABBR'].unique().tolist()
+province_list = canada_shape['PREABBR'].unique().tolist()
 province_idx = range(len(province_list))
 viz_dict = {}
-for i in province_idx:
-    province = province_list[i]
-    result = data_frame[data_frame['PREABBR'] == province]
+for i in canada_shape.index:
+    province = canada_shape['PREABBR'][i]
+    result = viz_frame[viz_frame['PREABBR'] == province]
     inner_dict = {}
     for index, r in result.iterrows():
         inner_dict[r['dt_index']] = {'color': r['color'], 'opacity': 0.7}
     viz_dict[i] = inner_dict
 
+print(viz_dict)
+print(canada_shape['PREABBR'])
 # Choropleth test
 m = folium.Map(location=[48, -102], zoom_start=4)
-# folium.Choropleth(
-#     geo_data=canada_geo,
-#     name='choropleth',
-#     data=data_frame,
-#     columns=['PREABBR', 'Quantity_converted'],
-#     key_on='feature.properties.PREABBR',
-#     fill_color='BuPu',
-#     fill_opacity=0.7,
-#     line_opacity=0.2,
-#     legend_name='Waste Produced in 000',
-#     bins=bins,
-#     reset=True
-# ).add_to(m)
 
-TimeSliderChoropleth(data=data_frame.to_json(), styledict=viz_dict,
+TimeSliderChoropleth(data=canada_geo.to_json(), styledict=viz_dict,
                      name='Waste by province').add_to(m)
 folium.LayerControl().add_to(m)
 
