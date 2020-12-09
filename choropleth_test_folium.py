@@ -85,12 +85,10 @@ for i in canada_shape.index:
         inner_dict[r['dt_index']] = {'color': r['color'], 'opacity': 0.7}
     viz_dict[i] = inner_dict
 
-print(viz_dict)
-print(canada_shape['PREABBR'])
 # Choropleth test
 m = folium.Map(location=[48, -102], zoom_start=4)
 
-TimeSliderChoropleth(data=canada_geo.to_json(), styledict=viz_dict,
+TimeSliderChoropleth(data=canada_shape.to_json(), styledict=viz_dict,
                      name='Waste by province').add_to(m)
 folium.LayerControl().add_to(m)
 
