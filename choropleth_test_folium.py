@@ -61,7 +61,6 @@ data_frame = data_frame.reset_index(drop=True)
 data_frame['Reporting_Year'] = data_frame['Reporting_Year']*1e4+101
 data_frame['Reporting_Year'] = pd.to_datetime(data_frame['Reporting_Year']
                                               .astype('int64').astype('str'))
-
 datetime_index = pd.DatetimeIndex(data_frame['Reporting_Year'])
 dt_index_epochs = datetime_index.astype(int)
 data_frame['dt_index'] = dt_index_epochs.astype('U10')
@@ -87,11 +86,9 @@ for i in canada_shape.index:
 
 # Choropleth test
 m = folium.Map(location=[48, -102], zoom_start=4)
-
 TimeSliderChoropleth(data=canada_shape.to_json(), styledict=viz_dict,
                      name='Waste by province').add_to(m)
 folium.LayerControl().add_to(m)
-
 m.save('choropleth_test.html')
 
 
