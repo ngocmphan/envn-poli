@@ -70,6 +70,7 @@ viz_frame = pd.merge(data_frame, canada_shape, on="PREABBR")
 max_color = max(data_frame['Quantity_converted'])
 min_color = min(data_frame['Quantity_converted'])
 cmap = cm.linear.YlOrRd_09.scale(min_color, max_color)
+cmap.caption = "Amount of waste disposed by provinces"
 viz_frame['color'] = viz_frame['Quantity_converted'].map(cmap)
 
 # Styledict for TimesliderChoropleth
@@ -89,6 +90,7 @@ m = folium.Map(location=[48, -102], zoom_start=4)
 TimeSliderChoropleth(data=canada_shape.to_json(), styledict=viz_dict,
                      name='Waste by province').add_to(m)
 folium.LayerControl().add_to(m)
+m.add_child(cmap)
 m.save('choropleth_test.html')
 
 
