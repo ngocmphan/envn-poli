@@ -1,16 +1,7 @@
-from urllib.request import urlopen
-from bokeh.models import GeoJSONDataSource, LinearColorMapper, Slider, HoverTool
-from bokeh.plotting import figure
-from bokeh.models.glyphs import Patches
-from bokeh.layouts import widgetbox, row, column
-import bokeh
-import bokeh.palettes as bp
 import geopandas as gpd
 from explore_visual import merged_recycle_dispo_loc, recycle_loc, dispo_loc
 from data_import import canada_pop
-from bokeh.io import curdoc
 import json
-from datetime import datetime
 
 year_chosen = 2006
 method_chosen = 'recycled'
