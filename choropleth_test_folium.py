@@ -60,12 +60,33 @@ def data_frame_prep(data_frame):
     data_frame = data_frame.reset_index(drop=True)
     data_frame['Reporting_Year'] = data_frame['Reporting_Year'] * 1e4 + 101
     data_frame['Reporting_Year'] = pd.to_datetime(
-        data_frame['Reporting_Year']
-            .astype('int64').astype('str'))
+        data_frame['Reporting_Year'].astype('int64').astype('str'))
     datetime_index = pd.DatetimeIndex(data_frame['Reporting_Year'])
     dt_index_epochs = datetime_index.astype(int)
     data_frame['dt_index'] = dt_index_epochs.astype('U10')
     return data_frame
+
+
+def viz_dict_prep(visualization_frame, shape_frame):
+    viz_dict = {}
+    for i in shape_frame.index:
+        province = shape_frame['PREABBR'][i]
+        result = visualization_frame[viz_frame['PREABBR'] == province]
+        inner_dict = {}
+        for index, r in result.iterrows():
+            inner_dict[r['dt_index']] = {'color': r['color'], 'opacity': 0.7}
+        viz_dict[i] = inner_dict
+    return viz_dict
+
+
+def color_scale_prep(visualization_frame):
+    max_color = max(visualization_frame['Quantity_converted'])
+    min_color = min(visualization_frame['Quantity_converted'])
+    cmap = cm.linear.YlOrRd_09.scale(min_color, max_color)
+    cmap.caption = "Amount of waste disposed by provinces"
+    visualization_frame['color'] = visualization_frame
+    ['Quantity_converted'].map(cmap)
+    return visualization_frame, cmap
 
 
 def data_for_viz(type_of_method):
@@ -74,17 +95,23 @@ def data_for_viz(type_of_method):
         data_frame = recycle_loc.copy()
         data_frame = data_frame_prep(data_frame)
         viz_frame = pd.merge(data_frame, canada_shape, on="PREABBR")
-        return viz_frame
+        viz_frame, cmap = color_scale_prep(viz_frame)
+        viz_dict = viz_dict_prep(viz_frame, canada_shape)
+        return viz_dict, cmap
     elif type_of_method == 'disposed':
         data_frame = dispo_loc.copy()
         data_frame = data_frame_prep(data_frame)
         viz_frame = pd.merge(data_frame, canada_shape, on="PREABBR")
-        return viz_frame
+        viz_frame, cmap = color_scale_prep(viz_frame)
+        viz_dict = viz_dict_prep(viz_frame, canada_shape)
+        return viz_dict, cmap
     elif type_of_method == 'total':
         data_frame = merged_recycle_dispo_loc.copy()
         data_frame = data_frame_prep(data_frame)
         viz_frame = pd.merge(data_frame, canada_shape, on="PREABBR")
-        return viz_frame
+        viz_frame, cmap = color_scale_prep(viz_frame)
+        viz_dict = viz_dict_prep(viz_frame, canada_shape)
+        return viz_dict, cmap
     else:
         raise ValueError('Input validation required')
 
@@ -137,7 +164,6 @@ viz_frame['color'] = viz_frame['Quantity_converted'].map(cmap)
 
 # Styledict for TimesliderChoropleth: Choropleth dictionary
 province_list = canada_shape['PREABBR'].unique().tolist()
-province_idx = range(len(province_list))
 viz_dict = {}
 for i in canada_shape.index:
     province = canada_shape['PREABBR'][i]
