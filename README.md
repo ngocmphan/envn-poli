@@ -22,7 +22,8 @@ Data is collected annually, ranges from 1971 - 2020, and presents population by 
 
 ## Tools
 * Python 
-* Visualization: Plotly, Bokeh
+* Visualization: Plotly, Bokeh, Folium
 * Geomapping: Geopandas
+* Dashboard - Web app: Flask
 
 
