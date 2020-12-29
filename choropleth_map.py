@@ -10,7 +10,7 @@ import json
 
 year_chosen = 2006
 method_chosen = 'recycled'
-pop = 'No'
+pop = 'Yes'
 
 
 def adjusted_province(data_frame):
@@ -63,7 +63,7 @@ def df_province_adjust(data_frame):
 def data_population_prep(data_frame):
     pop_year = canada_pop.copy()
     merged_data = pop_year.merge(data_frame, left_on='PROVINCE_ADJUSTED',
-                                 right_on='PROVINCE_ADJUSTED', how='right')
+                                 right_on='PREABBR', how='right')
     merged_data['Quantity_converted'] = merged_data['Quantity_converted'] / \
                                             merged_data['population']
     return merged_data
