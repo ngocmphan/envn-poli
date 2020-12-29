@@ -164,7 +164,7 @@ def choropleth_map(type_of_method, pop_choice):
                          name='Waste by province').add_to(m)
     folium.LayerControl().add_to(m)
     m.add_child(cmap)
-    m.save('choropleth_test_2.html')
+    m.save('{} and {} to population ratio.html'.format(type_of_method, pop_choice))
     return m
 
 
