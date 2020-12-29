@@ -60,7 +60,7 @@ def df_province_adjust(data_frame):
     return df
 
 
-def data_pop_prep(data_frame):
+def data_population_prep(data_frame):
     pop_year = canada_pop.copy()
     merged_data = pop_year.merge(data_frame, left_on='PROVINCE_ADJUSTED',
                                  right_on='PROVINCE_ADJUSTED', how='right')
@@ -69,7 +69,7 @@ def data_pop_prep(data_frame):
     return merged_data
 
 
-def data_frame_prep(data_frame):
+def data_quantity_adjusted(data_frame):
     df = data_frame
     df['Reporting_Year'] = df['Reporting_Year'] * 1e4 + 101
     df['Reporting_Year'] = pd.to_datetime(
@@ -102,60 +102,55 @@ def color_scale_prep(visualization_frame):
     return visualization_frame, cmap
 
 
-def data_for_viz(type_of_method, pop_choice):
+def data_frame_prep(data_frame):
     canada_shape = json_sources()
+    viz_frame = pd.merge(data_frame, canada_shape, on="PREABBR")
+    viz_frame, cmap = color_scale_prep(viz_frame)
+    viz_dict = viz_dict_prep(viz_frame, canada_shape)
+    return viz_dict, cmap
+
+
+def data_for_viz(type_of_method, pop_choice):
     if pop_choice == 'No':
         if type_of_method == 'recycled':
             data_frame = recycle_loc.copy()
             data_frame = df_province_adjust(data_frame)
-            data_frame = data_frame_prep(data_frame)
-            viz_frame = pd.merge(data_frame, canada_shape, on="PREABBR")
-            viz_frame, cmap = color_scale_prep(viz_frame)
-            viz_dict = viz_dict_prep(viz_frame, canada_shape)
+            data_frame = data_quantity_adjusted(data_frame)
+            viz_dict, cmap = data_frame_prep(data_frame)
             return viz_dict, cmap
         elif type_of_method == 'disposed':
             data_frame = dispo_loc.copy()
             data_frame = df_province_adjust(data_frame)
-            data_frame = data_frame_prep(data_frame)
-            viz_frame = pd.merge(data_frame, canada_shape, on="PREABBR")
-            viz_frame, cmap = color_scale_prep(viz_frame)
-            viz_dict = viz_dict_prep(viz_frame, canada_shape)
+            data_frame = data_quantity_adjusted(data_frame)
+            viz_dict, cmap = data_frame_prep(data_frame)
             return viz_dict, cmap
         elif type_of_method == 'total':
             data_frame = merged_recycle_dispo_loc.copy()
             data_frame = df_province_adjust(data_frame)
-            data_frame = data_frame_prep(data_frame)
-            viz_frame = pd.merge(data_frame, canada_shape, on="PREABBR")
-            viz_frame, cmap = color_scale_prep(viz_frame)
-            viz_dict = viz_dict_prep(viz_frame, canada_shape)
+            data_frame = data_quantity_adjusted(data_frame)
+            viz_dict, cmap = data_frame_prep(data_frame)
             return viz_dict, cmap
     elif pop_choice == 'Yes':
         if type_of_method == 'recycled':
             data_frame = recycle_loc.copy()
             data_frame = df_province_adjust(data_frame)
-            data_frame = data_pop_prep(data_frame)
-            data_frame = data_frame_prep(data_frame)
-            viz_frame = pd.merge(data_frame, canada_shape, on='PREABBR')
-            viz_frame, cmap = color_scale_prep(viz_frame)
-            viz_dict = viz_dict_prep(viz_frame, canada_shape)
+            data_frame = data_population_prep(data_frame)
+            data_frame = data_quantity_adjusted(data_frame)
+            viz_dict, cmap = data_frame_prep(data_frame)
             return viz_dict, cmap
         elif type_of_method == 'disposed':
             data_frame = dispo_loc.copy()
             data_frame = df_province_adjust(data_frame)
-            data_frame = data_pop_prep(data_frame)
-            data_frame = data_frame_prep(data_frame)
-            viz_frame = pd.merge(data_frame, canada_shape, on='PREABBR')
-            viz_frame, cmap = color_scale_prep(viz_frame)
-            viz_dict = viz_dict_prep(viz_frame, canada_shape)
+            data_frame = data_population_prep(data_frame)
+            data_frame = data_quantity_adjusted(data_frame)
+            viz_dict, cmap = data_frame_prep(data_frame)
             return viz_dict, cmap
         elif type_of_method == 'total':
             data_frame = merged_recycle_dispo_loc.copy()
             data_frame = df_province_adjust(data_frame)
-            data_frame = data_pop_prep(data_frame)
-            data_frame = data_frame_prep(data_frame)
-            viz_frame = pd.merge(data_frame, canada_shape, on='PREABBR')
-            viz_frame, cmap = color_scale_prep(viz_frame)
-            viz_dict = viz_dict_prep(viz_frame, canada_shape)
+            data_frame = data_population_prep(data_frame)
+            data_frame = data_quantity_adjusted(data_frame)
+            viz_dict, cmap = data_frame_prep(data_frame)
             return viz_dict, cmap
     else:
         raise ValueError('Input validation required')
