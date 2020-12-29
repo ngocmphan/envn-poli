@@ -10,7 +10,7 @@ import json
 
 year_chosen = 2006
 method_chosen = 'recycled'
-pop = 'yes'
+pop = 'No'
 
 
 def adjusted_province(data_frame):
@@ -156,9 +156,9 @@ def data_for_viz(type_of_method, pop_choice):
         raise ValueError('Input validation required')
 
 
-def choropleth_map(type_of_method):
+def choropleth_map(type_of_method, pop_choice):
     canada_shape = json_sources()
-    viz_dict, cmap = data_for_viz(type_of_method)
+    viz_dict, cmap = data_for_viz(type_of_method, pop_choice=pop_choice)
     m = folium.Map(location=[48, -102], zoom_start=4)
     TimeSliderChoropleth(data=canada_shape.to_json(), styledict=viz_dict,
                          name='Waste by province').add_to(m)
@@ -169,4 +169,4 @@ def choropleth_map(type_of_method):
 
 
 if __name__ == '__main__':
-    choropleth_map(type_of_method=method_chosen)
+    choropleth_map(type_of_method=method_chosen, pop_choice=pop)
