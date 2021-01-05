@@ -8,9 +8,8 @@ from data_import import canada_pop
 import json
 
 
-year_chosen = 2006
-method_chosen = 'recycled'
-pop = 'Yes'
+method_chosen = 'disposed'
+pop = 'No'
 
 
 def adjusted_province(data_frame):
